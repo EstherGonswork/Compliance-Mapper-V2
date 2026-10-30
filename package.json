@@ -1,0 +1,25 @@
+{
+  "name": "boiler-parts-compliance-mapper",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:pages": "cross-env NEXT_PUBLIC_BASE_PATH=/Compliance-Mapper-V2 next build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "15.5.28",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
+    "cross-env": "7.0.3",
+    "typescript": "5.9.2",
+    "vitest": "3.2.4"
+  }
+}
