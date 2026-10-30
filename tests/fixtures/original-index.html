@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boiler Parts Compliance Mapper</title>
+<style>
+  .bt-root {
+    --navy: #1e3a5f;
+    --navy-dark: #142a47;
+    --steel: #44627e;
+    --amber: #c2700f;
+    --amber-bg: #fef3e2;
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --border: #e1e7ec;
+    --text: #1c2733;
+    --text-muted: #647184;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    max-width: 780px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  .bt-root * { box-sizing: border-box; }
+
+  .bt-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .bt-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+    color: #fff;
+    padding: 28px 28px 24px;
+  }
+  .bt-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9fb8d4;
+    margin: 0 0 8px;
+  }
+  .bt-header h2 {
+    margin: 0 0 8px;
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .bt-header p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: #cdddee;
+    max-width: 560px;
+  }
+
+  .bt-form {
+    padding: 24px 28px 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 18px;
+  }
+  .bt-field { display: flex; flex-direction: column; gap: 6px; }
+  .bt-field.full { grid-column: 1 / -1; }
+  .bt-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .bt-field label .bt-opt {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-style: italic;
+  }
+  .bt-field small {
+    color: var(--text-muted);
+    font-size: 11.5px;
+    margin-top: -1px;
+  }
+
+  select, input[type="number"] {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 9px 11px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  select:focus, input[type="number"]:focus {
+    border-color: var(--steel);
+    box-shadow: 0 0 0 3px rgba(68,98,126,0.12);
+  }
+  select { cursor: pointer; }
+
+  .bt-pressure-row {
+    display: flex;
+    gap: 8px;
+  }
+  .bt-pressure-row input { flex: 1.4; }
+  .bt-pressure-row select { flex: 1; }
+
+  .bt-results-wrap {
+    padding: 4px 28px 28px;
+  }
+
+  .bt-result {
+    margin-top: 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    animation: bt-fade 0.25s ease;
+  }
+  @keyframes bt-fade {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bt-placeholder {
+    margin-top: 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .bt-result-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eef2f6;
+    color: var(--navy);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+
+  .bt-conv {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .bt-section { margin-bottom: 18px; }
+  .bt-section:last-child { margin-bottom: 0; }
+  .bt-section h4 {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin: 0 0 6px;
+    font-weight: 700;
+  }
+  .bt-code-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 6px;
+    line-height: 1.35;
+  }
+  .bt-detail {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+    margin: 0;
+  }
+  .bt-marking {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .bt-checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .bt-checklist li {
+    display: flex;
+    gap: 9px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .bt-checklist li::before {
+    content: "✓";
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e7f0e9;
+    color: #2f7d4f;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .bt-callout {
+    background: var(--amber-bg);
+    border: 1px solid #f0d4a8;
+    border-radius: 10px;
+    padding: 13px 15px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #7a4a0c;
+    margin-top: 16px;
+  }
+  .bt-callout strong { color: #5c3608; }
+
+  .bt-disclaimer {
+    padding: 16px 28px 22px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  @media (max-width: 540px) {
+    .bt-form { grid-template-columns: 1fr; }
+    .bt-header { padding: 22px 20px 20px; }
+    .bt-form, .bt-results-wrap, .bt-disclaimer { padding-left: 20px; padding-right: 20px; }
+  }
+</style>
+</head>
+<body style="margin:0; padding:20px; background:#f1f4f7;">
+
+<div class="bt-root">
+  <div class="bt-card">
+    <div class="bt-header">
+      <p class="bt-eyebrow">Compliance Tool</p>
+      <h2>Boiler Parts Compliance Mapper</h2>
+      <p>Select a target market and enter the operating pressure to see the applicable code, required marking, and what to request from your supplier before manufacture.</p>
+    </div>
+
+    <div class="bt-form">
+      <div class="bt-field">
+        <label for="bt-region">Target region</label>
+        <select id="bt-region">
+          <option value="us">🇺🇸 United States</option>
+          <option value="eu">🇪🇺 European Union</option>
+          <option value="uk">🇬🇧 United Kingdom</option>
+          <option value="in">🇮🇳 India</option>
+          <option value="cn">🇨🇳 China</option>
+          <option value="au">🇦🇺 Australia / New Zealand</option>
+        </select>
+      </div>
+
+      <div class="bt-field">
+        <label for="bt-equip">Equipment type</label>
+        <select id="bt-equip">
+          <option value="steam">Steam boiler</option>
+          <option value="hotwater">Hot water boiler</option>
+          <option value="vesselpart">Pressure vessel / boiler part</option>
+        </select>
+      </div>
+
+      <div class="bt-field">
+        <label for="bt-pressure">Operating pressure</label>
+        <div class="bt-pressure-row">
+          <input type="number" id="bt-pressure" placeholder="e.g. 12" step="any" min="0">
+          <select id="bt-unit">
+            <option value="bar">bar</option>
+            <option value="psi">psi</option>
+            <option value="kgcm2">kg/cm²</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bt-field" id="bt-volume-field">
+        <label for="bt-volume">Vessel volume (litres) <span class="bt-opt">optional</span></label>
+        <input type="number" id="bt-volume" placeholder="e.g. 500" step="any" min="0">
+        <small id="bt-volume-help"></small>
+      </div>
+
+      <div class="bt-field full" id="bt-category-field" style="display:none;">
+        <label for="bt-category">PED/PESR category, if already known <span class="bt-opt">optional</span></label>
+        <select id="bt-category">
+          <option value="">Not sure — show me the classification logic</option>
+          <option value="sep">SEP (below Category I)</option>
+          <option value="I">Category I</option>
+          <option value="II">Category II</option>
+          <option value="III">Category III</option>
+          <option value="IV">Category IV</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="bt-results-wrap">
+      <div id="bt-result"></div>
+    </div>
+
+    <div class="bt-disclaimer">
+      This tool gives a directional read on which code applies and what to ask your supplier for. It isn't a substitute for sign-off from a Notified Body, Inspecting Authority, or other accredited certifier — confirm final classification before manufacture or shipment.
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const PSI_PER_BAR = 14.5038;
+  const KGCM2_PER_BAR = 1.01972;
+
+  function toBar(value, unit) {
+    if (unit === 'bar') return value;
+    if (unit === 'psi') return value / PSI_PER_BAR;
+    if (unit === 'kgcm2') return value / KGCM2_PER_BAR;
+  }
+
+  function fmt(n) {
+    if (n === null || n === undefined || isNaN(n)) return '';
+    const r = Math.round(n * 100) / 100;
+    return r.toString();
+  }
+
+  const regionNames = {
+    us: '🇺🇸 United States', eu: '🇪🇺 European Union', uk: '🇬🇧 United Kingdom',
+    in: '🇮🇳 India', cn: '🇨🇳 China', au: '🇦🇺 Australia / New Zealand'
+  };
+  const equipNames = {
+    steam: 'Steam boiler', hotwater: 'Hot water boiler', vesselpart: 'Pressure vessel / boiler part'
+  };
+
+  function computeUS(equipType, psi) {
+    let code, detail;
+    if (equipType === 'steam') {
+      if (psi <= 15) {
+        code = 'ASME BPVC Section IV — Heating Boilers';
+        detail = `At ${fmt(psi)} psig, this is at or below the 15 psig threshold that separates heating boilers from power boilers, so Section IV construction rules apply.`;
+      } else {
+        code = 'ASME BPVC Section I — Power Boilers';
+        detail = `At ${fmt(psi)} psig, this exceeds the 15 psig threshold, so the part must be built to Section I rules for power boilers.`;
+      }
+    } else if (equipType === 'hotwater') {
+      if (psi <= 160) {
+        code = 'ASME BPVC Section IV — Heating Boilers';
+        detail = `At ${fmt(psi)} psig, this is within the Section IV range for hot water boilers (≤160 psig and ≤250°F). Confirm design temperature stays at or below 250°F — exceeding either limit moves the unit into Section I.`;
+      } else {
+        code = 'ASME BPVC Section I — Power Boilers';
+        detail = `At ${fmt(psi)} psig, this exceeds the 160 psig threshold for high-temperature water boilers, so Section I applies.`;
+      }
+    } else {
+      if (psi <= 15) {
+        code = 'Below Section VIII scope';
+        detail = `At ${fmt(psi)} psig, this falls below the 15 psig threshold that triggers Section VIII. Check the relevant component standard instead.`;
+      } else if (psi <= 3000) {
+        code = 'ASME BPVC Section VIII, Division 1';
+        detail = `At ${fmt(psi)} psig, this sits in the standard Section VIII Division 1 range. Division 2 is available as an alternative if the manufacturer wants higher allowable stresses in exchange for more rigorous design-by-analysis and NDE.`;
+      } else if (psi < 10000) {
+        code = 'ASME BPVC Section VIII, Division 2';
+        detail = `At ${fmt(psi)} psig, this is in a range where Division 2's alternative, more rigorous rules are commonly applied.`;
+      } else {
+        code = 'ASME BPVC Section VIII, Division 3';
+        detail = `At ${fmt(psi)} psig, this is in ultra-high-pressure territory, where Division 3 rules apply.`;
+      }
+    }
+    const marking = equipType === 'vesselpart'
+      ? "ASME 'U' Certification Mark (Section VIII)"
+      : "ASME 'S' Certification Mark (Section I power boilers); Section IV units typically carry the 'H' mark";
+    const checklist = [
+      'Materials sourced and certified to Section II',
+      'Welding procedures and welder qualifications per Section IX',
+      'Nondestructive examination per Section V',
+      "Manufacturer's Data Report signed by an Authorized Inspector",
+      'National Board registration — recommended for cross-border recognition'
+    ];
+    return { code, detail, marking, checklist, callout: null };
+  }
+
+  function computeIndia(equipType, kgcm2, volumeL) {
+    let code, detail;
+    if (equipType === 'steam' || equipType === 'hotwater') {
+      const exceedsVolume = volumeL !== null && !isNaN(volumeL) && volumeL > 22.75;
+      const exceedsPressure = kgcm2 > 1;
+      if (exceedsVolume || exceedsPressure) {
+        code = 'Indian Boiler Regulations (IBR), 1950 — full certification applies';
+        detail = `This exceeds the IBR threshold for a "boiler" under the Act — capacity above 22.75 litres (measured from the feed check valve to the main steam stop valve) or gauge pressure above 1 kg/cm². Full IBR certification is required before the unit can be installed in India.`;
+      } else {
+        code = "Check against IBR's boiler definition";
+        detail = `At ${fmt(kgcm2)} kg/cm²${volumeL !== null && !isNaN(volumeL) ? ' and ' + volumeL + ' litres' : ''}, this is under both IBR thresholds (22.75 litres / 1 kg/cm² gauge) as entered. Confirm the exact capacity measurement before ruling out certification.`;
+      }
+    } else {
+      if (kgcm2 > 3.5) {
+        code = 'IBR steam pipe certification applies';
+        detail = `At ${fmt(kgcm2)} kg/cm², this exceeds the 3.5 kg/cm² threshold above atmospheric pressure, so the pipe or fitting needs IBR certification regardless of diameter.`;
+      } else {
+        code = 'Check diameter against the IBR pipe threshold';
+        detail = `At ${fmt(kgcm2)} kg/cm², this is below the 3.5 kg/cm² pressure threshold. IBR certification is still required if the pipe's internal diameter exceeds 254mm.`;
+      }
+    }
+    const marking = 'Inspecting Authority endorsement (Central Boilers Board-recognized) on the relevant IBR form';
+    const checklist = [
+      'Design submitted to the Inspecting Authority, then CBB (Delhi) and the state Chief Inspector of Boilers for approval — manufacturing cannot begin before that sign-off',
+      'Material inspection and certification (Form IV for steelmakers)',
+      'Pressure parts inspection during fabrication',
+      'Component-specific forms: III (boiler), IIIA (pipe), IIIB (tube/source material), IIIC (fittings, mountings, valves)',
+      'Welder qualification tests, valid two years contingent on continuous employment on qualified work'
+    ];
+    return { code, detail, marking, checklist, callout: null };
+  }
+
+  function computePED(bar, volumeL, category, isUK) {
+    const markingName = isUK ? 'UKCA' : 'CE';
+    const bodyName = isUK ? 'UK Approved Body' : 'EU Notified Body';
+    const lawName = isUK ? 'PESR 2016' : 'PED 2014/68/EU';
+
+    if (bar <= 0.5) {
+      return {
+        code: `Outside ${lawName} scope`,
+        detail: `At ${fmt(bar)} bar, this is at or below the 0.5 bar threshold, so the regulation does not apply on this basis. No ${markingName} marking is required.`,
+        marking: 'None required',
+        checklist: ['Confirm no other directive applies — e.g. the Machinery Directive — before treating this as fully exempt.'],
+        callout: null
+      };
+    }
+
+    const categoryInfo = {
+      sep: { module: 'Sound Engineering Practice — no third-party involvement', doc: 'Manufacturer self-certifies design and construction quality. No Declaration of Conformity or marking required.' },
+      I: { module: 'Module A — manufacturer self-declaration', doc: `${markingName} marking applied without ${bodyName} involvement.` },
+      II: { module: 'Modules A2 / D1 / E1', doc: `Limited ${bodyName} involvement — periodic surveillance of production.` },
+      III: { module: 'Modules B+D / B+F / B+C2 / H', doc: `Full type or design examination, plus quality assurance or unit verification, by a ${bodyName}.` },
+      IV: { module: 'Modules B+D / B+F / G / H1', doc: `Most rigorous tier — full quality assurance with design examination, or one-off unit verification, by a ${bodyName}.` }
+    };
+
+    let code, detail, marking, checklist, callout = null;
+
+    if (category && categoryInfo[category]) {
+      const info = categoryInfo[category];
+      code = `${lawName} — Category ${category === 'sep' ? 'SEP' : category}`;
+      detail = `${info.module}. ${info.doc}`;
+      marking = category === 'sep' ? 'None' : `${markingName} marking + Declaration of Conformity`;
+      checklist = [
+        'Technical file: drawings, design calculation report, welding procedures (WPS/WPQR), NDT results, pressure test record',
+        'Hydrostatic or pneumatic test pressure per the applicable harmonized standard (commonly EN 13445 for vessels, EN 13480 for piping) — typically around 1.4× the maximum allowable pressure, adjusted for temperature',
+        category !== 'sep' ? `${bodyName} review and sign-off per the assigned conformity module` : 'Internal design and construction records retained, even without third-party review'
+      ];
+    } else {
+      code = `${lawName} — in scope, category to confirm`;
+      detail = `At ${fmt(bar)} bar${volumeL !== null && !isNaN(volumeL) ? ` and ${volumeL} litres` : ''}, this is above the 0.5 bar threshold, so classification is required. Category (SEP through IV) is read off Annex II's tables, cross-referencing pressure × volume — or pressure × diameter for piping — against fluid group. Group 1 hazardous fluids reach a higher category at a much lower pressure × volume than Group 2 fluids like steam or water, so that cross-reference isn't reducible to a single number here.`;
+      marking = `Depends on category — confirm with a ${bodyName}, or select a category above to see what it requires`;
+      checklist = [
+        'Confirm fluid group: Group 1 (hazardous — explosive, flammable, toxic, oxidising) or Group 2 (steam, water, compressed air, and similar)',
+        'Plot pressure × volume (or pressure × diameter for piping) against the relevant Annex II table for that fluid group and physical state',
+        'Once the category is known, select it above for the matching conformity module and documentation list'
+      ];
+      callout = `Don't have the exact category yet? Ask your supplier or ${bodyName} for the Annex II table reference they used — that's the fastest way to confirm it.`;
+    }
+
+    return { code, detail, marking, checklist, callout };
+  }
+
+  function computeChina(equipType) {
+    let code, detail;
+    if (equipType === 'vesselpart') {
+      code = 'TSG 21-2016 — Stationary Pressure Vessels';
+      detail = 'Pressure vessels and boiler parts sold or installed in China fall under TSG 21-2016, built to GB150 (pressure vessels) or GB151 (heat exchangers) as the design and construction standard.';
+    } else {
+      code = 'TSG 11-2020 — Regulation on Safety Technology for Boilers';
+      detail = 'Boilers fall under TSG 11-2020, administered alongside the relevant GB design standards for boiler materials and construction.';
+    }
+    const marking = 'SELO license (China Manufacture License, sometimes called the "China stamp"), issued by the State Administration for Market Regulation';
+    const checklist = [
+      'Hazard class (commonly Class I/II/III) assigned per TSG\'s own pressure, volume, and medium-hazard tables — confirm exact class with a SELO-recognized inspection body',
+      'Special Equipment Licensing Office approval before manufacture, installation, alteration, or significant repair',
+      'Supervision inspection at each of those stages, not only at final sign-off',
+      'Import inspection per TSG 21-2022 for equipment manufactured outside China'
+    ];
+    const callout = 'Class boundaries depend on pressure, volume, and medium together — ask your supplier which TSG class they\'re certifying to rather than inferring it from pressure alone.';
+    return { code, detail, marking, checklist, callout };
+  }
+
+  function computeAU(equipType) {
+    let code, detail;
+    if (equipType === 'vesselpart') {
+      code = 'AS 1210 — Pressure Vessels';
+      detail = 'Pressure vessels and boiler parts are built to AS 1210, which references ASME BPV-VIII, PD 5500, EN 13445, and GB150 as accepted equivalents.';
+    } else {
+      code = 'AS 1228 — Boilers';
+      detail = 'Boilers are built to AS 1228, which references ASME BPV-I, BS 855/1113/2790, and EN 12952/12953 as accepted equivalents.';
+    }
+    const marking = 'Design registration number, stamped on the equipment once registered with the state or territory WHS regulator';
+    const checklist = [
+      'Hazard Level assessed under AS 4343 (A through E) based on pressure, volume, temperature, and fluid hazard together — Levels A through D require design registration before manufacture',
+      'Design verification certificate from an independent or third-party verifier',
+      "Manufacturer's data report and design registration letter shared with the purchaser",
+      'In-service inspection per AS/NZS 3788 once installed',
+      'Welding and brazing qualification per AS 3992; inspector competencies per AS 4481'
+    ];
+    const callout = 'Hazard Level depends on pressure, volume, temperature, and fluid type together — ask your supplier for the AS 4343 hazard level they\'ve assigned rather than estimating it from pressure alone.';
+    return { code, detail, marking, checklist, callout };
+  }
+
+  function render(result, region, equipType, bar) {
+    const psi = bar * PSI_PER_BAR;
+    const kgcm2 = bar * KGCM2_PER_BAR;
+    const resultDiv = document.getElementById('bt-result');
+
+    const checklistHtml = result.checklist.map(item => `<li>${item}</li>`).join('');
+    const calloutHtml = result.callout ? `<div class="bt-callout"><strong>Next step:</strong> ${result.callout}</div>` : '';
+
+    resultDiv.innerHTML = `
+      <div class="bt-result">
+        <div class="bt-result-tag">${regionNames[region]} · ${equipNames[equipType]}</div>
+        <div class="bt-conv">Entered as ${fmt(bar)} bar ≈ ${fmt(psi)} psi ≈ ${fmt(kgcm2)} kg/cm²</div>
+
+        <div class="bt-section">
+          <h4>Applicable code</h4>
+          <p class="bt-code-name">${result.code}</p>
+          <p class="bt-detail">${result.detail}</p>
+        </div>
+
+        <div class="bt-section">
+          <h4>Marking / certification</h4>
+          <p class="bt-marking">${result.marking}</p>
+        </div>
+
+        <div class="bt-section">
+          <h4>What to request from your supplier</h4>
+          <ul class="bt-checklist">${checklistHtml}</ul>
+        </div>
+
+        ${calloutHtml}
+      </div>
+    `;
+  }
+
+  function update() {
+    const region = document.getElementById('bt-region').value;
+    const equipType = document.getElementById('bt-equip').value;
+    const pressureRaw = document.getElementById('bt-pressure').value;
+    const unit = document.getElementById('bt-unit').value;
+    const volumeRaw = document.getElementById('bt-volume').value;
+    const category = document.getElementById('bt-category').value;
+
+    const volumeField = document.getElementById('bt-volume-field');
+    const categoryField = document.getElementById('bt-category-field');
+    const volumeHelp = document.getElementById('bt-volume-help');
+
+    const showVolume = ['eu', 'uk', 'in'].includes(region);
+    volumeField.style.display = showVolume ? 'flex' : 'none';
+    categoryField.style.display = (region === 'eu' || region === 'uk') ? 'flex' : 'none';
+
+    if (region === 'in') {
+      volumeHelp.textContent = 'Checked against the 22.75 litre IBR boiler threshold.';
+    } else if (region === 'eu' || region === 'uk') {
+      volumeHelp.textContent = 'Used alongside pressure to help confirm the PED/PESR category.';
+    } else {
+      volumeHelp.textContent = '';
+    }
+
+    const pressureVal = parseFloat(pressureRaw);
+    const volumeVal = volumeRaw !== '' ? parseFloat(volumeRaw) : null;
+
+    if (isNaN(pressureVal) || pressureVal <= 0) {
+      document.getElementById('bt-result').innerHTML = `<div class="bt-placeholder">Enter an operating pressure above to see the applicable code and requirements.</div>`;
+      return;
+    }
+
+    const bar = toBar(pressureVal, unit);
+    const psi = bar * PSI_PER_BAR;
+    const kgcm2 = bar * KGCM2_PER_BAR;
+
+    let result;
+    switch (region) {
+      case 'us': result = computeUS(equipType, psi); break;
+      case 'eu': result = computePED(bar, volumeVal, category, false); break;
+      case 'uk': result = computePED(bar, volumeVal, category, true); break;
+      case 'in': result = computeIndia(equipType, kgcm2, volumeVal); break;
+      case 'cn': result = computeChina(equipType); break;
+      case 'au': result = computeAU(equipType); break;
+    }
+
+    render(result, region, equipType, bar);
+  }
+
+  ['bt-region', 'bt-equip', 'bt-pressure', 'bt-unit', 'bt-volume', 'bt-category'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', update);
+    el.addEventListener('change', update);
+  });
+
+  // Sensible defaults so the tool shows a result immediately
+  document.getElementById('bt-pressure').value = '12';
+  document.getElementById('bt-unit').value = 'bar';
+  update();
+})();
+</script>
+
+</body>
+</html>
