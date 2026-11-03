@@ -87,9 +87,18 @@ Ask a pressure equipment specialist to read the charts and sign off on the numbe
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm test           # 60 tests
+npm test           # 70 tests
 npm run typecheck
 ```
+
+## Light and dark mode
+
+A round button in the top right corner switches the theme.
+
+- With no saved choice, the page follows the device setting.
+- A tap saves the choice in this browser's local storage under `compliance-mapper.theme`. If storage is blocked, the switch still works until the page closes.
+- A small script in the page head sets the saved theme before the first paint, so a returning visitor sees no flash of the other theme.
+- The Rivexa tokens sit at the top of `app/globals.css`. The dark set applies under the device setting and under `data-theme="dark"`.
 
 ## Publish on GitHub Pages (free)
 

@@ -33,8 +33,9 @@
   --font-heading: "Chillax", "Urbanist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Dark theme. Follows the device setting until the visitor taps the toggle. A saved choice sets data-theme on the root element. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
     --violet-dark: #2a1d55;
     --teal-text: #8fe3d2;
@@ -58,6 +59,30 @@
     --check-bg: #0f2a27;
     --check-text: #3fd1b9;
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --violet-dark: #2a1d55;
+  --teal-text: #8fe3d2;
+  --teal-bg: #0f2a27;
+  --amber-bg: #2b2112;
+  --amber-border: #5a4320;
+  --amber-text: #f0c987;
+  --amber-strong: #f6dca9;
+
+  --bg: #12101c;
+  --card: #1b1829;
+  --border: #2e2947;
+  --text: #ece9f6;
+  --muted: #a29bba;
+  --label: #c8bcf4;
+  --field-bg: #141222;
+  --focus: #a995ea;
+  --chip-bg: #2a2542;
+  --chip-text: #d3c9f6;
+  --note-bg: #171427;
+  --check-bg: #0f2a27;
+  --check-text: #3fd1b9;
 }
 
 * { box-sizing: border-box; }
@@ -336,3 +361,24 @@ input[type="password"] { font-family: monospace; font-size: 14px; padding: 9px 1
 input[type="password"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 @media (max-width: 540px) { .bt-ai-wrap { padding-left: 18px; padding-right: 18px; } }
 .bt-guide > .bt-copy { align-self: flex-start; }
+
+/* Theme toggle */
+.theme-toggle {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: max(12px, env(safe-area-inset-right, 0px));
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--focus); }
+.theme-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
